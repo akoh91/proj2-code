@@ -21,6 +21,11 @@ class Analyzer(object):
         self.num_sims = num_sims
 
     def prepare_results(self, initial_pops=[50,100]):
+        """
+        Analyzes data from a batch run, preparing it for plotting.
+
+        """
+
         self.initial_pops = initial_pops
         self.result_dict = {}
 
@@ -50,28 +55,36 @@ class Analyzer(object):
         print(self.result_dict)
 
     def prepare_plots(self):
+        """
+        Generates analysis plots used for the final report (as seen in Fig. 7).
+
+        """
+
         sns.set_style('darkgrid')
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
         ax.set_xlabel('Initial population size (N)')
-        ax.set_ylabel('Standard deviation of adult counts')
+        ax.set_ylabel('Variation of adult counts over 10 years')
 
-        a = self.initial_pops
+        a = np.arange(1, len(self.initial_pops)+1, 1)
         b, c = [], []
 
-        for pop, results in self.result_dict.iteritems():
-            b.append(results['mean_stdev'])
-            c.append(results['ci'])
+        for pop in self.initial_pops:
+            result = self.result_dict[pop]
+
+            b.append(result['mean_stdev'])
+            c.append(result['ci'])
 
         ax.errorbar(a,b,yerr=c)
         ax.scatter(a,b,s=40)
         ax.plot(a,b)
+        plt.xticks(a,self.initial_pops)
 
         plt.show()
-        plt.savefig('results/results-111.png', bbox_inches='tight')
+        plt.savefig('results/results.png', bbox_inches='tight')
 
 if __name__ == '__main__':
-    analyzer = Analyzer(num_sims=30)
-    analyzer.prepare_results(initial_pops=[50,100,150,250,500,1000,1250])
+    analyzer = Analyzer(num_sims=2)
+    analyzer.prepare_results(initial_pops=[50,100])
     analyzer.prepare_plots()
